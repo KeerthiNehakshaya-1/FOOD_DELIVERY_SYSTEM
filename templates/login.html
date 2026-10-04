@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>FoodFlow - Login</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="auth-page">
+
+    <div class="auth-card">
+
+        <!-- LOGO -->
+
+        <div class="auth-icon">
+            🍴
+        </div>
+
+        <h1>FoodFlow</h1>
+
+        <p class="auth-subtitle">
+            Food Delivery Management System
+        </p>
+
+
+        {% if error %}
+
+        <div class="error-message">
+
+            ✕ {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- ==================== ADMIN ==================== -->
+
+        <div class="login-section">
+
+            <h2>🔐 Admin</h2>
+
+            <p class="login-description">
+                Login to manage the FoodFlow system.
+            </p>
+
+            <form method="POST"
+                  action="{{ url_for('admin_login') }}">
+
+                <div class="form-group">
+
+                    <label>
+                        Username
+                    </label>
+
+                    <input type="text"
+                           name="username"
+                           placeholder="Enter admin username"
+                           required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input type="password"
+                           name="password"
+                           placeholder="Enter admin password"
+                           required>
+
+                </div>
+
+
+                <button type="submit"
+                        class="btn-primary">
+
+                    Login as Admin
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- ==================== CUSTOMER ==================== -->
+
+        <div class="login-section">
+
+            <h2>🍔 Customer</h2>
+
+            <p class="login-description">
+
+                New customer or returning customer?
+                Continue to enter your details and order food.
+
+            </p>
+
+            <form method="GET"
+                  action="{{ url_for('customer_details') }}">
+
+                <button type="submit"
+                        class="btn-primary">
+
+                    Continue as Customer
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- ==================== DELIVERY ==================== -->
+
+        <div class="login-section">
+
+            <h2>🛵 Delivery Partner</h2>
+
+            <p class="login-description">
+
+                Login to view and manage your assigned deliveries.
+
+            </p>
+
+            <form method="POST"
+                  action="{{ url_for('delivery_login') }}">
+
+                <div class="form-group">
+
+                    <label>
+                        Username
+                    </label>
+
+                    <input type="text"
+                           name="username"
+                           placeholder="Enter delivery username"
+                           required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Password
+                    </label>
+
+                    <input type="password"
+                           name="password"
+                           placeholder="Enter delivery password"
+                           required>
+
+                </div>
+
+
+                <button type="submit"
+                        class="btn-primary">
+
+                    Login as Delivery Partner
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <div class="auth-note">
+
+            <strong>FoodFlow</strong>
+
+            <br>
+
+            Secure and simple food delivery management
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

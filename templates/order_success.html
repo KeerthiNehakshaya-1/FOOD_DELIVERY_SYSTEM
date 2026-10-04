@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Order Successful | FoodFlow</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        /* =================================================
+           ORDER SUCCESS PAGE
+           ================================================= */
+
+        .customer-page {
+            min-height: 100vh;
+            background: #f8f9fb;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            box-sizing: border-box;
+        }
+
+
+        /* =================================================
+           SUCCESS CONTAINER
+           ================================================= */
+
+        .success-container {
+            width: 100%;
+            max-width: 720px;
+            margin: 55px 20px;
+            padding: 40px;
+            background: #ffffff;
+            border: 1px solid #e6e8ec;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+            box-sizing: border-box;
+        }
+
+
+        /* =================================================
+           SUCCESS ICON
+           ================================================= */
+
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eaf8ef;
+            color: #249653;
+            border: 1px solid #bfe8cd;
+            border-radius: 50%;
+            font-size: 38px;
+            font-weight: 700;
+        }
+
+
+        /* =================================================
+           HEADING
+           ================================================= */
+
+        .success-container h1 {
+            margin: 0 0 10px;
+            color: #1f2937;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+
+        .success-container > p {
+            margin: 0 0 30px;
+            color: #7b8190;
+            font-size: 15px;
+        }
+
+
+        /* =================================================
+           ORDER SUMMARY
+           ================================================= */
+
+        .order-summary {
+            text-align: left;
+            padding: 25px;
+            margin-bottom: 25px;
+            background: #fff9f4;
+            border: 1px solid #ffd8ba;
+            border-radius: 12px;
+        }
+
+
+        .order-summary h2 {
+            margin: 0 0 20px;
+            color: #1f2937;
+            font-size: 21px;
+        }
+
+
+        .order-summary p {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin: 12px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1dfd2;
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+
+        .order-summary p:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+
+        .order-summary strong {
+            color: #374151;
+        }
+
+
+        /* =================================================
+           STATUS
+           ================================================= */
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            background: #fff0df;
+            color: #d96b12;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+
+        /* =================================================
+           ERROR MESSAGE
+           ================================================= */
+
+        .error-message {
+            padding: 15px;
+            margin-bottom: 25px;
+            background: #fff1f1;
+            border: 1px solid #f2c4c4;
+            border-radius: 9px;
+            color: #b42318;
+            font-size: 14px;
+        }
+
+
+        /* =================================================
+           ACTIONS
+           ================================================= */
+
+        .success-actions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+
+        .success-actions a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 145px;
+            padding: 11px 18px;
+            box-sizing: border-box;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+
+        /* Order Again */
+
+        .success-actions .primary-btn {
+            background: #f47b20;
+            color: #ffffff;
+            border: 1px solid #f47b20;
+        }
+
+
+        .success-actions .primary-btn:hover {
+            background: #df650f;
+            border-color: #df650f;
+            box-shadow: 0 5px 13px rgba(244, 123, 32, 0.22);
+            transform: translateY(-1px);
+        }
+
+
+        /* My Orders */
+
+        .success-actions .btn-primary {
+            background: #fff4eb;
+            color: #e86f13;
+            border: 1px solid #ffd2b0;
+        }
+
+
+        .success-actions .btn-primary:hover {
+            background: #ffe8d5;
+            border-color: #f6bd91;
+        }
+
+
+        /* Logout */
+
+        .success-actions .back-btn {
+            background: #ffffff;
+            color: #6b7280;
+            border: 1px solid #d9dde3;
+        }
+
+
+        .success-actions .back-btn:hover {
+            background: #f5f6f8;
+            color: #374151;
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 600px) {
+
+            .success-container {
+                margin: 25px 15px;
+                padding: 28px 20px;
+            }
+
+
+            .success-container h1 {
+                font-size: 25px;
+            }
+
+
+            .order-summary {
+                padding: 20px;
+            }
+
+
+            .order-summary p {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+
+            .success-actions {
+                flex-direction: column;
+            }
+
+
+            .success-actions a {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="customer-page">
+
+
+    <!-- =================================================
+         SUCCESS CONTAINER
+         ================================================= -->
+
+    <div class="success-container">
+
+
+        <!-- =================================================
+             SUCCESS ICON
+             ================================================= -->
+
+        <div class="success-icon">
+            ✓
+        </div>
+
+
+
+        <!-- =================================================
+             HEADING
+             ================================================= -->
+
+        <h1>
+            Order Placed Successfully!
+        </h1>
+
+
+        <p>
+            Thank you for ordering from FoodFlow.
+        </p>
+
+
+
+        <!-- =================================================
+             ORDER SUMMARY
+             ================================================= -->
+
+        {% if order %}
+
+
+        <div class="order-summary">
+
+
+            <h2>
+                Order Summary
+            </h2>
+
+
+            <p>
+
+                <strong>
+                    Order ID:
+                </strong>
+
+                <span>
+                    #{{ order[0] }}
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Customer:
+                </strong>
+
+                <span>
+                    {{ order[1] }}
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Restaurant:
+                </strong>
+
+                <span>
+                    {{ order[2] }}
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Total Amount:
+                </strong>
+
+                <span>
+                    ₹{{ "%.2f"|format(order[3]) }}
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Order Status:
+                </strong>
+
+                <span class="status-badge">
+                    {{ order[4] }}
+                </span>
+
+            </p>
+
+
+        </div>
+
+
+        {% else %}
+
+
+        <div class="error-message">
+
+            Order details could not be loaded.
+
+        </div>
+
+
+        {% endif %}
+
+
+
+        <!-- =================================================
+             CUSTOMER ACTIONS
+             ================================================= -->
+
+        <div class="success-actions">
+
+
+            <a href="{{ url_for('customer_home') }}"
+               class="primary-btn">
+
+                🍽️ Order Again
+
+            </a>
+
+
+            <a href="{{ url_for('customer_orders') }}"
+               class="btn-primary">
+
+                📦 View My Orders
+
+            </a>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="back-btn">
+
+                🚪 Logout
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

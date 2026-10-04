@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Deliveries - FoodFlow</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🍴
+            </div>
+
+            <div>
+
+                <h2>
+                    FoodFlow
+                </h2>
+
+                <span>
+                    Food Delivery System
+                </span>
+
+            </div>
+
+        </div>
+
+        <nav class="navigation">
+
+            <div class="nav-title">
+                MAIN
+            </div>
+
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="nav-link">
+
+                <span>📊</span>
+
+                Dashboard
+
+            </a>
+
+            <div class="nav-title management-title">
+                DATABASE
+            </div>
+
+            <a href="{{ url_for('customers_page') }}"
+               class="nav-link">
+
+                <span>👤</span>
+
+                Customers
+
+            </a>
+
+            <a href="{{ url_for('restaurants_page') }}"
+               class="nav-link">
+
+                <span>🍴</span>
+
+                Restaurants
+
+            </a>
+
+            <a href="{{ url_for('menu_page') }}"
+               class="nav-link">
+
+                <span>🍕</span>
+
+                Menu
+
+            </a>
+
+            <a href="{{ url_for('orders_page') }}"
+               class="nav-link">
+
+                <span>📦</span>
+
+                Orders
+
+            </a>
+
+            <a href="{{ url_for('payments_page') }}"
+               class="nav-link">
+
+                <span>💳</span>
+
+                Payments
+
+            </a>
+
+            <a href="{{ url_for('delivery_partners_page') }}"
+               class="nav-link">
+
+                <span>🛵</span>
+
+                Delivery Partners
+
+            </a>
+
+            <a href="{{ url_for('deliveries_page') }}"
+               class="nav-link active">
+
+                <span>🚚</span>
+
+                Deliveries
+
+            </a>
+
+            <div class="nav-title management-title">
+                MANAGEMENT
+            </div>
+
+            <a href="{{ url_for('update_order') }}"
+               class="nav-link">
+
+                <span>✏️</span>
+
+                Update Order
+
+            </a>
+
+        </nav>
+
+        <div class="database-status">
+
+            <span class="online-dot"></span>
+
+            <div>
+
+                <strong>
+                    Database Online
+                </strong>
+
+                <small>
+                    Oracle Database
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link">
+
+                <span>🚪</span>
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================= -->
+
+    <div class="main-content">
+
+
+        <!-- PAGE HEADER -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Deliveries
+                </h1>
+
+                <p>
+                    Assign delivery partners and track delivery status.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =========================
+             MESSAGES
+        ========================= -->
+
+        {% if message %}
+
+        <div class="success-message">
+
+            {{ message }}
+
+        </div>
+
+        {% endif %}
+
+
+        {% if error %}
+
+        <div class="error-message">
+
+            {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =========================
+             ASSIGN DELIVERY
+        ========================= -->
+
+        <div class="form-card">
+
+            <h2>
+                Assign Delivery Partner
+            </h2>
+
+            <p class="form-description">
+
+                Select an order that does not have a delivery assignment
+                and assign a delivery partner.
+
+            </p>
+
+
+            {% if pending_orders %}
+
+            <form method="POST"
+                  action="{{ url_for('deliveries_page') }}">
+
+
+                <input type="hidden"
+                       name="action"
+                       value="assign">
+
+
+                <!-- ORDER -->
+
+                <div class="form-group">
+
+                    <label for="order_id">
+                        Order
+                    </label>
+
+                    <select
+                        name="order_id"
+                        id="order_id"
+                        required
+                    >
+
+                        <option value="">
+                            Select Order
+                        </option>
+
+
+                        {% for order in pending_orders %}
+
+                        <option value="{{ order[0] }}">
+
+                            Order #{{ order[0] }}
+                            -
+                            {{ order[1] }}
+                            -
+                            ₹{{ "%.2f"|format(order[3]) }}
+                            ({{ order[2] }})
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+
+                <!-- DELIVERY PARTNER -->
+
+                <div class="form-group">
+
+                    <label for="partner_id">
+                        Delivery Partner
+                    </label>
+
+                    <select
+                        name="partner_id"
+                        id="partner_id"
+                        required
+                    >
+
+                        <option value="">
+                            Select Delivery Partner
+                        </option>
+
+
+                        {% for partner in partners %}
+
+                        <option value="{{ partner[0] }}">
+
+                            {{ partner[1] }}
+                            -
+                            {{ partner[3] }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="btn-primary">
+
+                    Assign Delivery
+
+                </button>
+
+            </form>
+
+
+            {% else %}
+
+            <div class="empty-message">
+
+                All current orders already have
+                delivery assignments.
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- =========================
+             DELIVERY RECORDS
+        ========================= -->
+
+        <div class="table-card">
+
+            <div class="table-header">
+
+                <div>
+
+                    <h2>
+                        Delivery Records
+                    </h2>
+
+                    <p>
+                        Current delivery assignments and statuses.
+                    </p>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        {{ deliveries|length }}
+                    </strong>
+
+                    Deliveries
+
+                </div>
+
+            </div>
+
+
+            {% if deliveries %}
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Delivery ID</th>
+
+                            <th>Order ID</th>
+
+                            <th>Delivery Partner</th>
+
+                            <th>Delivery Date</th>
+
+                            <th>Status</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for delivery in deliveries %}
+
+                        <tr>
+
+                            <td>
+                                {{ delivery[0] }}
+                            </td>
+
+
+                            <td>
+
+                                <a
+                                    href="{{ url_for('order_details_page', order_id=delivery[1]) }}"
+                                    class="table-link"
+                                >
+
+                                    #{{ delivery[1] }}
+
+                                </a>
+
+                            </td>
+
+
+                            <td>
+                                {{ delivery[2] }}
+                            </td>
+
+
+                            <td>
+
+                                {% if delivery[3] %}
+
+                                    {{ delivery[3] }}
+
+                                {% else %}
+
+                                    <span class="text-muted">
+                                        Not Delivered
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if delivery[4] == "Delivered" %}
+
+                                    <span class="status-badge status-delivered">
+                                        Delivered
+                                    </span>
+
+
+                                {% elif delivery[4] == "Out for Delivery" %}
+
+                                    <span class="status-badge status-out">
+                                        Out for Delivery
+                                    </span>
+
+
+                                {% elif delivery[4] == "Picked Up" %}
+
+                                    <span class="status-badge status-preparing">
+                                        Picked Up
+                                    </span>
+
+
+                                {% elif delivery[4] == "Cancelled" %}
+
+                                    <span class="status-badge status-cancelled">
+                                        Cancelled
+                                    </span>
+
+
+                                {% elif delivery[4] == "Assigned" %}
+
+                                    <span class="status-badge status-placed">
+                                        Assigned
+                                    </span>
+
+
+                                {% else %}
+
+                                    <span class="status-badge status-placed">
+                                        {{ delivery[4] }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            {% else %}
+
+            <div class="empty-message">
+
+                No delivery records are available yet.
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <!-- =========================
+             INFORMATION
+        ========================= -->
+
+        <div class="form-card">
+
+            <h2>
+                Delivery Status Flow
+            </h2>
+
+            <p class="form-description">
+
+                Delivery status is updated as the order moves through
+                the delivery process.
+
+            </p>
+
+
+            <div class="status-flow">
+
+                <span class="status-badge status-placed">
+                    Assigned
+                </span>
+
+                <span>→</span>
+
+                <span class="status-badge status-preparing">
+                    Picked Up
+                </span>
+
+                <span>→</span>
+
+                <span class="status-badge status-out">
+                    Out for Delivery
+                </span>
+
+                <span>→</span>
+
+                <span class="status-badge status-delivered">
+                    Delivered
+                </span>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

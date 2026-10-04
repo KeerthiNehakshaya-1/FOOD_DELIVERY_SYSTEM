@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Orders - FoodFlow</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="customer-page">
+
+    <!-- Header -->
+
+    <header class="customer-header">
+
+        <div>
+            <h1>FoodFlow</h1>
+
+            <p>
+                My Orders
+            </p>
+        </div>
+
+        <div class="customer-header-actions">
+
+            <a href="{{ url_for('customer_home') }}"
+               class="btn-secondary">
+                🍽️ Restaurants
+            </a>
+
+            <a href="{{ url_for('logout') }}"
+               class="btn-secondary">
+                🚪 Logout
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- Main Content -->
+
+    <main class="customer-orders-container">
+
+        <div class="customer-orders-heading">
+
+            <h2>My Orders</h2>
+
+            <p>
+                View all the orders you have placed.
+            </p>
+
+        </div>
+
+
+        {% if orders %}
+
+            {% for order in orders %}
+
+                <div class="customer-order-card">
+
+                    <!-- Order Header -->
+
+                    <div class="customer-order-header">
+
+                        <div>
+
+                            <h3>
+                                Order #{{ order[0] }}
+                            </h3>
+
+                            <p>
+                                {{ order[2] }}
+                            </p>
+
+                        </div>
+
+
+                        <div class="customer-order-status">
+
+                            {% if order[4] == "Placed" %}
+
+                                <span class="status-badge placed">
+                                    Placed
+                                </span>
+
+                            {% elif order[4] == "Preparing" %}
+
+                                <span class="status-badge preparing">
+                                    Preparing
+                                </span>
+
+                            {% elif order[4] == "Out for Delivery" %}
+
+                                <span class="status-badge out-for-delivery">
+                                    Out for Delivery
+                                </span>
+
+                            {% elif order[4] == "Delivered" %}
+
+                                <span class="status-badge delivered">
+                                    Delivered
+                                </span>
+
+                            {% elif order[4] == "Cancelled" %}
+
+                                <span class="status-badge cancelled">
+                                    Cancelled
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Order Information -->
+
+                    <div class="customer-order-info">
+
+                        <div>
+                            <strong>Order ID</strong>
+                            <span>#{{ order[0] }}</span>
+                        </div>
+
+                        <div>
+                            <strong>Restaurant</strong>
+                            <span>{{ order[2] }}</span>
+                        </div>
+
+                        <div>
+                            <strong>Order Date</strong>
+                            <span>{{ order[1] }}</span>
+                        </div>
+
+                        <div>
+                            <strong>Total Amount</strong>
+                            <span>
+                                ₹{{ "%.2f"|format(order[3]) }}
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Order Details -->
+
+                    <div class="customer-order-details">
+
+                        <h4>
+                            Order Details
+                        </h4>
+
+                        {% for detail in order_details[order[0]] %}
+
+                            <div class="customer-order-item">
+
+                                <div>
+
+                                    <strong>
+                                        {{ detail[1] }}
+                                    </strong>
+
+                                    <small>
+                                        {{ detail[2] }}
+                                    </small>
+
+                                </div>
+
+                                <div>
+                                    Qty: {{ detail[3] }}
+                                </div>
+
+                                <div>
+                                    ₹{{ "%.2f"|format(detail[4]) }}
+                                </div>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- Actions -->
+
+                    <div class="customer-order-actions">
+
+                        {% if order[4] == "Placed"
+                              or order[4] == "Preparing" %}
+
+                            <form method="POST"
+                                  action="{{ url_for(
+                                      'cancel_customer_order',
+                                      order_id=order[0]
+                                  ) }}"
+                                  onsubmit="return confirm(
+                                      'Are you sure you want to cancel this order?'
+                                  );">
+
+                                <button type="submit"
+                                        class="btn-danger">
+
+                                    Cancel Order
+
+                                </button>
+
+                            </form>
+
+                        {% elif order[4] == "Cancelled" %}
+
+                            <span class="not-available">
+                                Order Cancelled
+                            </span>
+
+                        {% elif order[4] == "Out for Delivery" %}
+
+                            <span class="not-available">
+                                Cancellation unavailable
+                            </span>
+
+                        {% elif order[4] == "Delivered" %}
+
+                            <span class="not-available">
+                                Order Delivered
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <div class="empty-message">
+
+                <h3>No Orders Yet</h3>
+
+                <p>
+                    You haven't placed any orders yet.
+                </p>
+
+                <a href="{{ url_for('customer_home') }}"
+                   class="btn-primary">
+
+                    Browse Restaurants
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Order Error | FoodFlow</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="customer-page">
+
+
+    <!-- =================================================
+         ERROR CONTAINER
+         ================================================= -->
+
+    <div class="success-container">
+
+
+        <!-- ERROR ICON -->
+
+        <div class="error-icon">
+            !
+        </div>
+
+
+
+        <!-- HEADING -->
+
+        <h1>
+            Unable to Place Order
+        </h1>
+
+
+        <p>
+            {{ message }}
+        </p>
+
+
+
+        <!-- =================================================
+             ACTIONS
+             ================================================= -->
+
+        <div class="success-actions">
+
+
+            <a href="{{ url_for('customer_home') }}"
+               class="primary-btn">
+
+                🍽️ Back to Restaurants
+
+            </a>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="back-btn">
+
+                🚪 Logout
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

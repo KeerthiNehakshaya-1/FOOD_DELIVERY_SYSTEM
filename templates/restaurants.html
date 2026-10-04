@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FoodFlow - Restaurants</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- ==================== SIDEBAR ==================== -->
+
+    <aside class="sidebar">
+
+        <!-- LOGO -->
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🍴
+            </div>
+
+            <div>
+
+                <h2>
+                    FoodFlow
+                </h2>
+
+                <span>
+                    Food Delivery System
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <nav class="navigation">
+
+            <!-- MAIN -->
+
+            <div class="nav-title">
+                MAIN
+            </div>
+
+
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="nav-link">
+
+                <span>📊</span>
+
+                Dashboard
+
+            </a>
+
+
+            <!-- DATABASE -->
+
+            <div class="nav-title management-title">
+                DATABASE
+            </div>
+
+
+            <a href="{{ url_for('customers_page') }}"
+               class="nav-link">
+
+                <span>👤</span>
+
+                Customers
+
+            </a>
+
+
+            <a href="{{ url_for('restaurants_page') }}"
+               class="nav-link active">
+
+                <span>🍴</span>
+
+                Restaurants
+
+            </a>
+
+
+            <a href="{{ url_for('menu_page') }}"
+               class="nav-link">
+
+                <span>🍕</span>
+
+                Menu
+
+            </a>
+
+
+            <a href="{{ url_for('orders_page') }}"
+               class="nav-link">
+
+                <span>📦</span>
+
+                Orders
+
+            </a>
+
+
+            <!--
+                Order Details requires a specific order_id,
+                so it is accessed by clicking an Order ID
+                from the Orders page.
+            -->
+
+
+            <a href="{{ url_for('payments_page') }}"
+               class="nav-link">
+
+                <span>💳</span>
+
+                Payments
+
+            </a>
+
+
+            <a href="{{ url_for('delivery_partners_page') }}"
+               class="nav-link">
+
+                <span>🛵</span>
+
+                Delivery Partners
+
+            </a>
+
+
+            <a href="{{ url_for('deliveries_page') }}"
+               class="nav-link">
+
+                <span>🚚</span>
+
+                Deliveries
+
+            </a>
+
+
+            <!-- MANAGEMENT -->
+
+            <div class="nav-title management-title">
+                MANAGEMENT
+            </div>
+
+
+            <a href="{{ url_for('update_order') }}"
+               class="nav-link">
+
+                <span>✏️</span>
+
+                Update Order
+
+            </a>
+
+        </nav>
+
+
+        <!-- DATABASE STATUS -->
+
+        <div class="database-status">
+
+            <span class="online-dot"></span>
+
+            <div>
+
+                <strong>
+                    Database Online
+                </strong>
+
+                <small>
+                    Oracle Database
+                </small>
+
+            </div>
+
+        </div>
+
+
+        <!-- LOGOUT -->
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link">
+
+                <span>🚪</span>
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1>Restaurants</h1>
+
+                <p>
+                    Restaurant records from the database
+                </p>
+
+            </div>
+
+
+            <div class="topbar-right">
+
+                <span class="online-dot"></span>
+
+                System Online
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE HEADER -->
+
+        <section class="page-header">
+
+            <h1>Restaurant Records</h1>
+
+            <p>
+                Restaurants registered in the FoodFlow food delivery system
+            </p>
+
+        </section>
+
+
+        <!-- RESTAURANT TABLE -->
+
+        <div class="table-container">
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Restaurant ID</th>
+
+                        <th>Restaurant Name</th>
+
+                        <th>Location</th>
+
+                        <th>Phone</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% if restaurants %}
+
+                        {% for restaurant in restaurants %}
+
+                        <tr>
+
+                            <td>
+                                {{ restaurant[0] }}
+                            </td>
+
+
+                            <td>
+                                <strong>
+                                    {{ restaurant[1] }}
+                                </strong>
+                            </td>
+
+
+                            <td>
+                                {{ restaurant[2] }}
+                            </td>
+
+
+                            <td>
+                                {{ restaurant[3] }}
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+
+                            <td colspan="4"
+                                style="text-align: center; padding: 30px;">
+
+                                No restaurant records found.
+
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div class="page-summary">
+
+            <strong>
+                Total Restaurants:
+            </strong>
+
+            {{ restaurants|length }}
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <footer>
+
+            <span>
+                FoodFlow • Food Delivery Management System
+            </span>
+
+            <span>
+                Oracle Database • Flask
+            </span>
+
+        </footer>
+
+
+    </main>
+
+</div>
+
+</body>
+</html>

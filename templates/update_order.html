@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Update Order - FoodFlow</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🍴
+            </div>
+
+            <div>
+
+                <h2>
+                    FoodFlow
+                </h2>
+
+                <span>
+                    Food Delivery System
+                </span>
+
+            </div>
+
+        </div>
+
+        <nav class="navigation">
+
+            <div class="nav-title">
+                MAIN
+            </div>
+
+            <a href="{{ url_for('admin_dashboard') }}"
+               class="nav-link">
+
+                <span>📊</span>
+
+                Dashboard
+
+            </a>
+
+            <div class="nav-title management-title">
+                DATABASE
+            </div>
+
+            <a href="{{ url_for('customers_page') }}"
+               class="nav-link">
+
+                <span>👤</span>
+
+                Customers
+
+            </a>
+
+            <a href="{{ url_for('restaurants_page') }}"
+               class="nav-link">
+
+                <span>🍴</span>
+
+                Restaurants
+
+            </a>
+
+            <a href="{{ url_for('menu_page') }}"
+               class="nav-link">
+
+                <span>🍕</span>
+
+                Menu
+
+            </a>
+
+            <a href="{{ url_for('orders_page') }}"
+               class="nav-link">
+
+                <span>📦</span>
+
+                Orders
+
+            </a>
+
+            <a href="{{ url_for('payments_page') }}"
+               class="nav-link">
+
+                <span>💳</span>
+
+                Payments
+
+            </a>
+
+            <a href="{{ url_for('delivery_partners_page') }}"
+               class="nav-link">
+
+                <span>🛵</span>
+
+                Delivery Partners
+
+            </a>
+
+            <a href="{{ url_for('deliveries_page') }}"
+               class="nav-link">
+
+                <span>🚚</span>
+
+                Deliveries
+
+            </a>
+
+            <div class="nav-title management-title">
+                MANAGEMENT
+            </div>
+
+            <a href="{{ url_for('update_order') }}"
+               class="nav-link active">
+
+                <span>✏️</span>
+
+                Update Order
+
+            </a>
+
+        </nav>
+
+        <div class="database-status">
+
+            <span class="online-dot"></span>
+
+            <div>
+
+                <strong>
+                    Database Online
+                </strong>
+
+                <small>
+                    Oracle Database
+                </small>
+
+            </div>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link">
+
+                <span>🚪</span>
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+<!-- =========================
+     MAIN CONTENT
+========================= -->
+
+<div class="main-content">
+
+
+    <!-- PAGE HEADER -->
+
+    <div class="page-header">
+
+        <div>
+
+            <h1>
+                Update Order
+            </h1>
+
+            <p>
+                Change the status of an existing order.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         MESSAGE
+    ========================= -->
+
+    {% if message %}
+
+    <div class="
+        {% if message_type == 'error' %}
+            error-message
+        {% else %}
+            success-message
+        {% endif %}
+    ">
+
+        {{ message }}
+
+    </div>
+
+    {% endif %}
+
+
+
+    <!-- =========================
+         UPDATE FORM
+    ========================= -->
+
+    <div class="form-card">
+
+        <h2>
+            Order Status Management
+        </h2>
+
+
+        <p class="form-description">
+
+            Select an order ID and choose the new
+            status for that order.
+
+        </p>
+
+
+        <form method="POST"
+              action="{{ url_for('update_order') }}">
+
+
+            <!-- ORDER ID -->
+
+            <div class="form-group">
+
+                <label for="order_id">
+                    Order ID
+                </label>
+
+
+                <input
+                    type="number"
+                    id="order_id"
+                    name="order_id"
+                    placeholder="Example: 101"
+                    min="1"
+                    required
+                >
+
+            </div>
+
+
+
+            <!-- STATUS -->
+
+            <div class="form-group">
+
+                <label for="status">
+                    Order Status
+                </label>
+
+
+                <select
+                    id="status"
+                    name="status"
+                    required
+                >
+
+                    <option value="">
+                        Select Status
+                    </option>
+
+                    <option value="Placed">
+                        Placed
+                    </option>
+
+                    <option value="Preparing">
+                        Preparing
+                    </option>
+
+                    <option value="Out for Delivery">
+                        Out for Delivery
+                    </option>
+
+                    <option value="Delivered">
+                        Delivered
+                    </option>
+
+                    <option value="Cancelled">
+                        Cancelled
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="btn-primary">
+
+                Update Order
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- =========================
+         STATUS INFORMATION
+    ========================= -->
+
+    <div class="form-card">
+
+        <h2>
+            Order Status Flow
+        </h2>
+
+
+        <p class="form-description">
+
+            The order normally progresses through
+            the following stages:
+
+        </p>
+
+
+        <div class="status-flow">
+
+            <span class="status-badge status-placed">
+                Placed
+            </span>
+
+            <span>→</span>
+
+            <span class="status-badge status-preparing">
+                Preparing
+            </span>
+
+            <span>→</span>
+
+            <span class="status-badge status-out">
+                Out for Delivery
+            </span>
+
+            <span>→</span>
+
+            <span class="status-badge status-delivered">
+                Delivered
+            </span>
+
+        </div>
+
+
+        <p class="form-description">
+
+            An order may also be marked as
+            <strong>Cancelled</strong> when required.
+
+        </p>
+
+    </div>
+
+
+
+    <!-- BACK BUTTON -->
+
+    <div class="page-actions">
+
+        <a href="{{ url_for('orders_page') }}"
+           class="back-button">
+
+            ← Back to Orders
+
+        </a>
+
+    </div>
+
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <span>
+            FoodFlow • Food Delivery Management System
+        </span>
+
+        <span>
+            Oracle Database
+        </span>
+
+    </footer>
+
+
+</div>
+
+
+</div>
+
+
+</body>
+
+</html>

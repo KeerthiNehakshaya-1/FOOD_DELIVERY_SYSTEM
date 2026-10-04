@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>FoodFlow | Customer Portal</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        /* =================================================
+           CUSTOMER HOME PAGE
+           ================================================= */
+
+        .customer-page {
+            min-height: 100vh;
+            background: #f8f9fb;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        /* =================================================
+           TOP BAR
+           ================================================= */
+
+        .customer-topbar {
+            background: #ffffff;
+            min-height: 82px;
+            padding: 18px 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eeeeee;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+
+
+        .customer-topbar h1 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+
+        .customer-topbar p {
+            margin: 5px 0 0;
+            color: #7b8190;
+            font-size: 14px;
+        }
+
+
+        .customer-user-area {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+
+        .customer-welcome {
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+
+
+        /* =================================================
+           BUTTONS
+           ================================================= */
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 17px;
+            background: #fff4eb;
+            color: #e86f13;
+            border: 1px solid #ffd8ba;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+
+        .btn-secondary:hover {
+            background: #ffe8d5;
+            border-color: #f6bd91;
+        }
+
+
+        .customer-user-area .nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 14px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.2s ease;
+        }
+
+
+        .customer-user-area .nav-link:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+
+        /* =================================================
+           MAIN CONTENT
+           ================================================= */
+
+        .customer-heading {
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 42px 35px 24px;
+            box-sizing: border-box;
+        }
+
+
+        .customer-heading h2 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            color: #1f2937;
+        }
+
+
+        .customer-heading p {
+            margin: 0;
+            color: #7b8190;
+            font-size: 15px;
+        }
+
+
+        /* =================================================
+           RESTAURANT GRID
+           ================================================= */
+
+        .restaurant-grid {
+            max-width: 1250px;
+            margin: 0 auto;
+            padding: 0 35px 50px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+            box-sizing: border-box;
+        }
+
+
+        /* =================================================
+           RESTAURANT CARD
+           ================================================= */
+
+        .restaurant-card {
+            background: #ffffff;
+            border: 1px solid #e6e8ec;
+            border-radius: 14px;
+            padding: 24px;
+            min-height: 205px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s ease,
+                        box-shadow 0.2s ease,
+                        border-color 0.2s ease;
+
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+
+        .restaurant-card:hover {
+            transform: translateY(-4px);
+            border-color: #ffd2b0;
+            box-shadow: 0 9px 24px rgba(0, 0, 0, 0.08);
+        }
+
+
+        .restaurant-icon {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff2e8;
+            border-radius: 10px;
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
+
+
+        .restaurant-card h3 {
+            margin: 0 0 12px;
+            color: #1f2937;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+
+        .restaurant-card p {
+            margin: 4px 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+
+        /* =================================================
+           VIEW MENU BUTTON
+           ================================================= */
+
+        .restaurant-card .primary-btn {
+            display: inline-block;
+            margin-top: auto;
+            padding: 10px 18px;
+            background: #f47b20;
+            color: #ffffff;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+
+        .restaurant-card .primary-btn:hover {
+            background: #df650f;
+            box-shadow: 0 4px 10px rgba(244, 123, 32, 0.25);
+        }
+
+
+        /* =================================================
+           EMPTY STATE
+           ================================================= */
+
+        .empty-state {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 45px 30px;
+            background: #ffffff;
+            border: 1px solid #e6e8ec;
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+        }
+
+
+        .empty-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff2e8;
+            border-radius: 50%;
+            font-size: 28px;
+        }
+
+
+        .empty-state h3 {
+            margin: 0 0 10px;
+            color: #1f2937;
+            font-size: 21px;
+        }
+
+
+        .empty-state p {
+            margin: 0;
+            color: #7b8190;
+            font-size: 14px;
+        }
+
+
+        /* =================================================
+           RESPONSIVE DESIGN
+           ================================================= */
+
+        @media (max-width: 900px) {
+
+            .restaurant-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .customer-topbar {
+                padding: 18px 25px;
+            }
+
+            .customer-heading {
+                padding-left: 25px;
+                padding-right: 25px;
+            }
+
+            .restaurant-grid {
+                padding-left: 25px;
+                padding-right: 25px;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .customer-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 18px;
+            }
+
+            .customer-user-area {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .restaurant-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .customer-heading {
+                padding-top: 30px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="customer-page">
+
+
+    <!-- =================================================
+         TOP BAR
+         ================================================= -->
+
+    <div class="customer-topbar">
+
+
+        <div>
+
+            <h1>
+                🍽️ FoodFlow
+            </h1>
+
+            <p>
+                Customer Ordering Portal
+            </p>
+
+        </div>
+
+
+        <div class="customer-user-area">
+
+            <span class="customer-welcome">
+                Welcome, {{ session.get('customer_name') }}
+            </span>
+
+
+            <a href="{{ url_for('customer_orders') }}"
+               class="btn-secondary">
+
+                📦 My Orders
+
+            </a>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link">
+
+                🚪 Logout
+
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         CUSTOMER HEADING
+         ================================================= -->
+
+    <div class="customer-heading">
+
+
+        <h2>
+            Choose a Restaurant
+        </h2>
+
+
+        <p>
+            Select a restaurant to explore its menu
+            and place your order.
+        </p>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         RESTAURANTS
+         ================================================= -->
+
+    {% if restaurants %}
+
+
+    <div class="restaurant-grid">
+
+
+        {% for restaurant in restaurants %}
+
+
+        <div class="restaurant-card">
+
+
+            <div class="restaurant-icon">
+                🍴
+            </div>
+
+
+            <h3>
+                {{ restaurant[1] }}
+            </h3>
+
+
+            <p>
+                📍 {{ restaurant[2] }}
+            </p>
+
+
+            <p>
+                📞 {{ restaurant[3] }}
+            </p>
+
+
+            <a
+                href="{{ url_for(
+                    'customer_menu',
+                    restaurant_id=restaurant[0]
+                ) }}"
+                class="primary-btn"
+            >
+
+                View Menu
+
+            </a>
+
+
+        </div>
+
+
+        {% endfor %}
+
+
+    </div>
+
+
+    {% else %}
+
+
+    <!-- =================================================
+         NO RESTAURANTS
+         ================================================= -->
+
+    <div class="empty-state">
+
+
+        <div class="empty-icon">
+            🍽️
+        </div>
+
+
+        <h3>
+            No Restaurants Available
+        </h3>
+
+
+        <p>
+            There are currently no restaurants available
+            for ordering.
+        </p>
+
+
+    </div>
+
+
+    {% endif %}
+
+
+</div>
+
+
+</body>
+
+</html>

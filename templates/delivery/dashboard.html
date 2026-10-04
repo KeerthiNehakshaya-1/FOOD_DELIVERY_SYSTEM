@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Delivery Dashboard - FoodFlow</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        /* =================================================
+           DELIVERY DASHBOARD
+           ================================================= */
+
+        .dashboard-layout {
+            min-height: 100vh;
+            display: flex;
+            background: #f7f8fa;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        /* =================================================
+           SIDEBAR
+           ================================================= */
+
+        .sidebar {
+            width: 235px;
+            min-height: 100vh;
+            background: #ffffff;
+            border-right: 1px solid #e5e7eb;
+            box-sizing: border-box;
+            padding: 28px 18px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+        }
+
+
+        .sidebar-brand {
+            padding: 4px 10px 28px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+
+        .sidebar-brand h2 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+
+        .sidebar-brand p {
+            margin: 5px 0 0;
+            color: #e86f13;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin-top: 25px;
+        }
+
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 13px;
+            color: #5f6673;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+
+        .sidebar-link:hover {
+            background: #fff4eb;
+            color: #e86f13;
+        }
+
+
+        .sidebar-link.active {
+            background: #fff0e5;
+            color: #e86f13;
+        }
+
+
+        .logout-link {
+            margin-top: 18px;
+            border-top: 1px solid #eeeeee;
+            border-radius: 0;
+            padding-top: 20px;
+        }
+
+
+        .logout-link:hover {
+            color: #c2410c;
+            background: #fff7f2;
+        }
+
+
+        /* =================================================
+           MAIN CONTENT
+           ================================================= */
+
+        .main-content {
+            width: calc(100% - 235px);
+            margin-left: 235px;
+            padding: 38px 45px 60px;
+            box-sizing: border-box;
+        }
+
+
+        /* =================================================
+           HEADER
+           ================================================= */
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+
+        .page-header h1 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 30px;
+        }
+
+
+        .page-header p {
+            margin: 7px 0 0;
+            color: #7b8190;
+            font-size: 14px;
+        }
+
+
+        .page-header strong {
+            color: #e86f13;
+        }
+
+
+        /* =================================================
+           ALERTS
+           ================================================= */
+
+        .alert {
+            padding: 13px 16px;
+            margin-bottom: 20px;
+            border-radius: 9px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+
+        .alert-success {
+            background: #edf9f1;
+            border: 1px solid #bfe5ca;
+            color: #247a40;
+        }
+
+
+        .alert-error {
+            background: #fff1f1;
+            border: 1px solid #efc2c2;
+            color: #b42318;
+        }
+
+
+        /* =================================================
+           SECTIONS
+           ================================================= */
+
+        .dashboard-section {
+            margin-bottom: 32px;
+        }
+
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+
+        .section-title h2 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 21px;
+        }
+
+
+        .count-badge {
+            min-width: 25px;
+            height: 25px;
+            padding: 0 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff0e5;
+            color: #e86f13;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            box-sizing: border-box;
+        }
+
+
+        /* =================================================
+           PROFILE
+           ================================================= */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+
+        .info-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 11px;
+            padding: 18px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.035);
+        }
+
+
+        .info-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #8a909b;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+
+        .info-card strong {
+            color: #374151;
+            font-size: 15px;
+        }
+
+
+        /* =================================================
+           DELIVERY LIST
+           ================================================= */
+
+        .delivery-list {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+
+        .delivery-card {
+            background: #ffffff;
+            border: 1px solid #e2e5e9;
+            border-radius: 14px;
+            padding: 23px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.045);
+        }
+
+
+        /* =================================================
+           DELIVERY HEADER
+           ================================================= */
+
+        .delivery-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 17px;
+            border-bottom: 1px solid #eeeeee;
+        }
+
+
+        .delivery-card-header h3 {
+            margin: 0 0 5px;
+            color: #1f2937;
+            font-size: 18px;
+        }
+
+
+        .delivery-card-header p {
+            margin: 0;
+            color: #8a909b;
+            font-size: 13px;
+        }
+
+
+        /* =================================================
+           STATUS BADGES
+           ================================================= */
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+
+        .status-badge.assigned {
+            background: #fff4df;
+            color: #b86b00;
+        }
+
+
+        .status-badge.picked-up {
+            background: #eef3ff;
+            color: #365fc7;
+        }
+
+
+        .status-badge.out-for-delivery {
+            background: #fff0e5;
+            color: #df650f;
+        }
+
+
+        .status-badge.delivered {
+            background: #eaf8ef;
+            color: #248247;
+        }
+
+
+        .status-badge.cancelled {
+            background: #fff0f0;
+            color: #bd3b3b;
+        }
+
+
+        /* =================================================
+           DELIVERY INFORMATION
+           ================================================= */
+
+        .delivery-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+
+        .delivery-info-item {
+            padding: 14px;
+            background: #f9fafb;
+            border: 1px solid #eef0f2;
+            border-radius: 9px;
+        }
+
+
+        .delivery-info-item span {
+            display: block;
+            margin-bottom: 6px;
+            color: #8a909b;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+
+        .delivery-info-item strong {
+            display: block;
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+
+        .delivery-info-item.full-width {
+            grid-column: 1 / -1;
+        }
+
+
+        /* =================================================
+           ACTION AREA
+           ================================================= */
+
+        .delivery-action-area {
+            margin-top: 20px;
+        }
+
+
+        .next-action-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 17px 18px;
+            background: #fff8f2;
+            border: 1px solid #ffd8ba;
+            border-radius: 10px;
+        }
+
+
+        .next-action-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #e86f13;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+
+        .next-action-box strong {
+            color: #374151;
+            font-size: 14px;
+        }
+
+
+        .delivery-action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+
+        /* =================================================
+           BUTTONS
+           ================================================= */
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 17px;
+            background: #f47b20;
+            color: #ffffff;
+            border: 1px solid #f47b20;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+
+        .btn-primary:hover {
+            background: #df650f;
+            border-color: #df650f;
+            box-shadow: 0 5px 12px rgba(244, 123, 32, 0.22);
+            transform: translateY(-1px);
+        }
+
+
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 17px;
+            background: #ffffff;
+            color: #c24141;
+            border: 1px solid #e4aaaa;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+
+        .btn-danger:hover {
+            background: #fff2f2;
+            border-color: #d98282;
+        }
+
+
+        /* =================================================
+           COMPLETED / CANCELLED
+           ================================================= */
+
+        .completed-box,
+        .cancelled-box {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 17px 18px;
+            border-radius: 10px;
+        }
+
+
+        .completed-box {
+            background: #edf9f1;
+            border: 1px solid #c5e8d0;
+        }
+
+
+        .completed-box strong {
+            color: #247a40;
+            font-size: 14px;
+        }
+
+
+        .completed-box span {
+            color: #64806d;
+            font-size: 13px;
+        }
+
+
+        .cancelled-box {
+            background: #fff2f2;
+            border: 1px solid #edc5c5;
+        }
+
+
+        .cancelled-box strong {
+            color: #bd3b3b;
+            font-size: 14px;
+        }
+
+
+        .cancelled-box span {
+            color: #806464;
+            font-size: 13px;
+        }
+
+
+        /* =================================================
+           EMPTY STATE
+           ================================================= */
+
+        .empty-state {
+            padding: 45px 25px;
+            background: #ffffff;
+            border: 1px dashed #d6d9de;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+            color: #374151;
+            font-size: 18px;
+        }
+
+
+        .empty-state p {
+            margin: 0;
+            color: #8a909b;
+            font-size: 14px;
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 1050px) {
+
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .main-content {
+                padding: 32px;
+            }
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 190px;
+            }
+
+            .main-content {
+                width: calc(100% - 190px);
+                margin-left: 190px;
+                padding: 28px 22px;
+            }
+
+            .delivery-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .delivery-info-item.full-width {
+                grid-column: auto;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .dashboard-layout {
+                display: block;
+            }
+
+            .sidebar {
+                position: static;
+                width: 100%;
+                min-height: auto;
+                border-right: none;
+                border-bottom: 1px solid #e5e7eb;
+                padding: 18px;
+            }
+
+            .sidebar-brand {
+                padding-bottom: 17px;
+            }
+
+            .sidebar-nav {
+                margin-top: 15px;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+
+            .logout-link {
+                margin-top: 0;
+                border-top: none;
+                padding-top: 12px;
+            }
+
+            .main-content {
+                width: 100%;
+                margin-left: 0;
+                padding: 25px 15px 45px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header h1 {
+                font-size: 25px;
+            }
+
+            .delivery-card {
+                padding: 18px;
+            }
+
+            .delivery-card-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .next-action-box {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .delivery-action-buttons {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .delivery-action-buttons form {
+                width: 100%;
+            }
+
+            .delivery-action-buttons button {
+                width: 100%;
+            }
+
+            .next-action-box > form {
+                width: 100%;
+            }
+
+            .next-action-box > form button {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="dashboard-layout">
+
+
+    <!-- =========================================
+         SIDEBAR
+         ========================================= -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-brand">
+
+            <h2>
+                🍽️ FoodFlow
+            </h2>
+
+            <p>
+                Delivery Partner
+            </p>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+
+            <a href="{{ url_for('delivery_dashboard') }}"
+               class="sidebar-link active">
+
+                📊 Dashboard
+
+            </a>
+
+
+            <a href="{{ url_for('delivery_dashboard') }}"
+               class="sidebar-link">
+
+                🛵 My Deliveries
+
+            </a>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="sidebar-link logout-link">
+
+                🚪 Logout
+
+            </a>
+
+
+        </nav>
+
+
+    </aside>
+
+
+
+    <!-- =========================================
+         MAIN CONTENT
+         ========================================= -->
+
+    <main class="main-content">
+
+
+        <!-- HEADER -->
+
+        <div class="page-header">
+
+
+            <div>
+
+                <h1>
+                    Delivery Dashboard
+                </h1>
+
+
+                <p>
+
+                    Welcome,
+                    <strong>{{ partner[1] }}</strong>
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- =========================================
+             SUCCESS MESSAGE
+             ========================================= -->
+
+        {% if message %}
+
+        <div class="alert alert-success">
+
+            {{ message }}
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =========================================
+             ERROR MESSAGE
+             ========================================= -->
+
+        {% if error %}
+
+        <div class="alert alert-error">
+
+            {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- =========================================
+             PROFILE
+             ========================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-title">
+
+                <h2>
+                    My Profile
+                </h2>
+
+            </div>
+
+
+            <div class="info-grid">
+
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Partner ID
+                    </span>
+
+                    <strong>
+                        {{ partner[0] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Name
+                    </span>
+
+                    <strong>
+                        {{ partner[1] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Phone
+                    </span>
+
+                    <strong>
+                        {{ partner[2] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Vehicle Number
+                    </span>
+
+                    <strong>
+                        {{ partner[3] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Aadhaar Number
+                    </span>
+
+                    <strong>
+                        {{ partner[4] }}
+                    </strong>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-label">
+                        Login Username
+                    </span>
+
+                    <strong>
+                        {{ partner[5] }}
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             DELIVERIES
+             ========================================= -->
+
+        <section class="dashboard-section">
+
+
+            <div class="section-title">
+
+                <h2>
+                    My Deliveries
+                </h2>
+
+
+                <span class="count-badge">
+                    {{ deliveries|length }}
+                </span>
+
+
+            </div>
+
+
+
+            {% if deliveries %}
+
+
+            <div class="delivery-list">
+
+
+                {% for delivery in deliveries %}
+
+
+                <!-- =================================
+                     DELIVERY CARD
+                     ================================= -->
+
+                <div class="delivery-card">
+
+
+                    <!-- DELIVERY HEADER -->
+
+                    <div class="delivery-card-header">
+
+
+                        <div>
+
+                            <h3>
+                                Delivery #{{ delivery[0] }}
+                            </h3>
+
+
+                            <p>
+                                Order #{{ delivery[1] }}
+                            </p>
+
+                        </div>
+
+
+
+                        <!-- STATUS -->
+
+                        <div>
+
+
+                            {% if delivery[10] == "Assigned" %}
+
+                            <span class="status-badge assigned">
+                                Assigned
+                            </span>
+
+
+                            {% elif delivery[10] == "Picked Up" %}
+
+                            <span class="status-badge picked-up">
+                                Picked Up
+                            </span>
+
+
+                            {% elif delivery[10] == "Out for Delivery" %}
+
+                            <span class="status-badge out-for-delivery">
+                                Out for Delivery
+                            </span>
+
+
+                            {% elif delivery[10] == "Delivered" %}
+
+                            <span class="status-badge delivered">
+                                Delivered
+                            </span>
+
+
+                            {% elif delivery[10] == "Cancelled" %}
+
+                            <span class="status-badge cancelled">
+                                Cancelled
+                            </span>
+
+
+                            {% endif %}
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================
+                         CUSTOMER INFORMATION
+                         ================================= -->
+
+                    <div class="delivery-info-grid">
+
+
+                        <div class="delivery-info-item">
+
+                            <span>
+                                Customer
+                            </span>
+
+                            <strong>
+                                {{ delivery[2] }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="delivery-info-item">
+
+                            <span>
+                                Phone
+                            </span>
+
+                            <strong>
+                                {{ delivery[3] }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="delivery-info-item full-width">
+
+                            <span>
+                                Delivery Address
+                            </span>
+
+                            <strong>
+                                {{ delivery[4] }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="delivery-info-item">
+
+                            <span>
+                                Restaurant
+                            </span>
+
+                            <strong>
+                                {{ delivery[5] }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="delivery-info-item">
+
+                            <span>
+                                Restaurant Location
+                            </span>
+
+                            <strong>
+                                {{ delivery[6] }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="delivery-info-item">
+
+                            <span>
+                                Order Amount
+                            </span>
+
+                            <strong>
+                                ₹{{ "%.2f"|format(delivery[7]) }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="delivery-info-item">
+
+                            <span>
+                                Order Status
+                            </span>
+
+                            <strong>
+                                {{ delivery[8] }}
+                            </strong>
+
+                        </div>
+
+
+                        {% if delivery[9] %}
+
+                        <div class="delivery-info-item">
+
+                            <span>
+                                Delivery Date
+                            </span>
+
+                            <strong>
+                                {{ delivery[9] }}
+                            </strong>
+
+                        </div>
+
+                        {% endif %}
+
+
+                    </div>
+
+
+
+                    <!-- =================================
+                         STATUS UPDATE
+                         ================================= -->
+
+                    <div class="delivery-action-area">
+
+
+                        {% if delivery[10] == "Assigned" %}
+
+
+                        <div class="next-action-box">
+
+
+                            <div>
+
+                                <span class="next-action-label">
+                                    Next Step
+                                </span>
+
+                                <strong>
+                                    Pick up the order
+                                </strong>
+
+                            </div>
+
+
+                            <form method="POST"
+                                  action="{{ url_for('delivery_dashboard') }}">
+
+
+                                <input
+                                    type="hidden"
+                                    name="delivery_id"
+                                    value="{{ delivery[0] }}">
+
+
+                                <input
+                                    type="hidden"
+                                    name="delivery_status"
+                                    value="Picked Up">
+
+
+                                <button
+                                    type="submit"
+                                    class="btn-primary">
+
+                                    Mark as Picked Up
+
+                                </button>
+
+
+                            </form>
+
+
+                        </div>
+
+
+                        {% elif delivery[10] == "Picked Up" %}
+
+
+                        <div class="next-action-box">
+
+
+                            <div>
+
+                                <span class="next-action-label">
+                                    Next Step
+                                </span>
+
+                                <strong>
+                                    Start delivery
+                                </strong>
+
+                            </div>
+
+
+                            <form method="POST"
+                                  action="{{ url_for('delivery_dashboard') }}">
+
+
+                                <input
+                                    type="hidden"
+                                    name="delivery_id"
+                                    value="{{ delivery[0] }}">
+
+
+                                <input
+                                    type="hidden"
+                                    name="delivery_status"
+                                    value="Out for Delivery">
+
+
+                                <button
+                                    type="submit"
+                                    class="btn-primary">
+
+                                    Start Delivery
+
+                                </button>
+
+
+                            </form>
+
+
+                        </div>
+
+
+                        {% elif delivery[10] == "Out for Delivery" %}
+
+
+                        <div class="next-action-box">
+
+
+                            <div>
+
+                                <span class="next-action-label">
+                                    Next Step
+                                </span>
+
+                                <strong>
+                                    Complete or cancel the delivery
+                                </strong>
+
+                            </div>
+
+
+                            <div class="delivery-action-buttons">
+
+
+                                <!-- DELIVERED -->
+
+                                <form method="POST"
+                                      action="{{ url_for('delivery_dashboard') }}">
+
+
+                                    <input
+                                        type="hidden"
+                                        name="delivery_id"
+                                        value="{{ delivery[0] }}">
+
+
+                                    <input
+                                        type="hidden"
+                                        name="delivery_status"
+                                        value="Delivered">
+
+
+                                    <button
+                                        type="submit"
+                                        class="btn-primary"
+                                        onclick="return confirm('Confirm that the order has been delivered?');">
+
+                                        Mark Delivered
+
+                                    </button>
+
+
+                                </form>
+
+
+
+                                <!-- CANCELLED -->
+
+                                <form method="POST"
+                                      action="{{ url_for('delivery_dashboard') }}">
+
+
+                                    <input
+                                        type="hidden"
+                                        name="delivery_id"
+                                        value="{{ delivery[0] }}">
+
+
+                                    <input
+                                        type="hidden"
+                                        name="delivery_status"
+                                        value="Cancelled">
+
+
+                                    <button
+                                        type="submit"
+                                        class="btn-danger"
+                                        onclick="return confirm('Confirm that the customer refused or cancelled the order at the doorstep?');">
+
+                                        Cancel at Doorstep
+
+                                    </button>
+
+
+                                </form>
+
+
+                            </div>
+
+
+                        </div>
+
+
+                        {% elif delivery[10] == "Delivered" %}
+
+
+                        <div class="completed-box">
+
+
+                            <strong>
+                                ✓ Delivery Completed
+                            </strong>
+
+
+                            <span>
+                                This delivery is completed and
+                                cannot be updated again.
+                            </span>
+
+
+                        </div>
+
+
+                        {% elif delivery[10] == "Cancelled" %}
+
+
+                        <div class="cancelled-box">
+
+
+                            <strong>
+                                Delivery Cancelled
+                            </strong>
+
+
+                            <span>
+                                This delivery is closed and
+                                cannot be updated again.
+                            </span>
+
+
+                        </div>
+
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                </div>
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+            {% else %}
+
+
+            <!-- =================================
+                 NO DELIVERIES
+                 ================================= -->
+
+            <div class="empty-state">
+
+
+                <h3>
+                    No Deliveries Assigned
+                </h3>
+
+
+                <p>
+                    You currently have no deliveries assigned
+                    to you.
+                </p>
+
+
+            </div>
+
+
+            {% endif %}
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+
+</body>
+
+</html>

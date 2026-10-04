@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>FoodFlow | Place Order</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+
+        /* =================================================
+           CUSTOMER ORDER PAGE
+           ================================================= */
+
+        .customer-page {
+            min-height: 100vh;
+            background: #f8f9fb;
+            color: #1f2937;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        /* =================================================
+           TOP BAR
+           ================================================= */
+
+        .customer-topbar {
+            background: #ffffff;
+            min-height: 82px;
+            padding: 18px 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #eeeeee;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+        }
+
+
+        .customer-topbar h1 {
+            margin: 0;
+            color: #1f2937;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+
+        .customer-topbar p {
+            margin: 5px 0 0;
+            color: #7b8190;
+            font-size: 14px;
+        }
+
+
+        .customer-user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+
+        .customer-welcome {
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 4px;
+        }
+
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 16px;
+            background: #fff4eb;
+            color: #e86f13;
+            border: 1px solid #ffd8ba;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s ease;
+        }
+
+
+        .back-btn:hover {
+            background: #ffe8d5;
+            border-color: #f6bd91;
+        }
+
+
+        .customer-user-area .nav-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 14px;
+            color: #6b7280;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: 0.2s ease;
+        }
+
+
+        .customer-user-area .nav-link:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+
+        /* =================================================
+           ORDER CONTAINER
+           ================================================= */
+
+        .order-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 35px 30px 60px;
+            box-sizing: border-box;
+        }
+
+
+        /* =================================================
+           SELECTED RESTAURANT
+           ================================================= */
+
+        .selected-restaurant {
+            background: #ffffff;
+            border: 1px solid #ffd8ba;
+            border-left: 5px solid #f47b20;
+            border-radius: 12px;
+            padding: 22px 25px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+        }
+
+
+        .selected-restaurant h2 {
+            margin: 0 0 12px;
+            color: #1f2937;
+            font-size: 25px;
+        }
+
+
+        .selected-restaurant p {
+            margin: 5px 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+
+        /* =================================================
+           FORM SECTIONS
+           ================================================= */
+
+        .customer-form-section {
+            background: #ffffff;
+            border: 1px solid #e6e8ec;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+        }
+
+
+        .customer-form-section h2 {
+            margin: 0 0 18px;
+            color: #1f2937;
+            font-size: 21px;
+        }
+
+
+        .section-description {
+            margin: -8px 0 20px;
+            color: #7b8190;
+            font-size: 14px;
+        }
+
+
+        /* =================================================
+           CUSTOMER DETAILS
+           ================================================= */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+
+        .form-group label {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 13px;
+            border: 1px solid #d9dde3;
+            border-radius: 8px;
+            background: #f9fafb;
+            color: #374151;
+            font-size: 14px;
+            outline: none;
+        }
+
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #f47b20;
+            box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.10);
+        }
+
+
+        .form-group input[readonly] {
+            background: #f6f7f9;
+            color: #4b5563;
+        }
+
+
+        .form-note {
+            margin: 18px 0 0;
+            padding: 12px 14px;
+            background: #fff8f2;
+            border-radius: 8px;
+            color: #7b8190;
+            font-size: 13px;
+        }
+
+
+        /* =================================================
+           FOOD LIST
+           ================================================= */
+
+        .food-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding: 18px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 11px;
+            transition: 0.2s ease;
+        }
+
+
+        .food-item:hover {
+            border-color: #ffd0ac;
+            box-shadow: 0 5px 14px rgba(0, 0, 0, 0.05);
+        }
+
+
+        .food-information {
+            min-width: 0;
+        }
+
+
+        .food-information h3 {
+            margin: 0 0 6px;
+            color: #1f2937;
+            font-size: 17px;
+        }
+
+
+        .food-information p {
+            margin: 0 0 8px;
+            color: #8a909b;
+            font-size: 13px;
+        }
+
+
+        .food-information strong {
+            color: #e86f13;
+            font-size: 15px;
+        }
+
+
+        /* =================================================
+           QUANTITY
+           ================================================= */
+
+        .quantity-box {
+            flex-shrink: 0;
+            width: 105px;
+        }
+
+
+        .quantity-box label {
+            display: block;
+            margin-bottom: 6px;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+
+        .quantity-box input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 9px 10px;
+            border: 1px solid #d9dde3;
+            border-radius: 7px;
+            text-align: center;
+            font-size: 14px;
+            outline: none;
+        }
+
+
+        .quantity-box input:focus {
+            border-color: #f47b20;
+            box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.10);
+        }
+
+
+        /* =================================================
+           PAYMENT
+           ================================================= */
+
+        .customer-form-section .form-group select {
+            max-width: 400px;
+            background: #ffffff;
+            cursor: pointer;
+        }
+
+
+        /* =================================================
+           PLACE ORDER BUTTON
+           ================================================= */
+
+        .place-order-btn {
+            display: block;
+            width: 100%;
+            padding: 14px 20px;
+            background: #f47b20;
+            color: #ffffff;
+            border: none;
+            border-radius: 9px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 14px rgba(244, 123, 32, 0.22);
+            transition: 0.2s ease;
+        }
+
+
+        .place-order-btn:hover {
+            background: #df650f;
+            box-shadow: 0 7px 18px rgba(244, 123, 32, 0.28);
+            transform: translateY(-1px);
+        }
+
+
+        .place-order-btn:active {
+            transform: translateY(0);
+        }
+
+
+        /* =================================================
+           EMPTY STATE
+           ================================================= */
+
+        .empty-state {
+            padding: 35px 20px;
+            background: #fafafa;
+            border: 1px dashed #d9dde3;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+
+        .empty-icon {
+            width: 55px;
+            height: 55px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff2e8;
+            border-radius: 50%;
+            font-size: 26px;
+        }
+
+
+        .empty-state h3 {
+            margin: 0 0 8px;
+            color: #374151;
+            font-size: 18px;
+        }
+
+
+        .empty-state p {
+            margin: 0;
+            color: #7b8190;
+            font-size: 14px;
+        }
+
+
+        /* =================================================
+           RESPONSIVE
+           ================================================= */
+
+        @media (max-width: 850px) {
+
+            .customer-topbar {
+                padding: 18px 25px;
+            }
+
+
+            .order-container {
+                padding-left: 25px;
+                padding-right: 25px;
+            }
+
+
+            .food-list {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .customer-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 17px;
+            }
+
+
+            .customer-user-area {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .order-container {
+                padding: 25px 15px 45px;
+            }
+
+
+            .customer-form-section {
+                padding: 20px;
+            }
+
+
+            .food-item {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+
+            .quantity-box {
+                width: 130px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="customer-page">
+
+
+    <!-- =================================================
+         TOP BAR
+         ================================================= -->
+
+    <div class="customer-topbar">
+
+
+        <div>
+
+            <h1>
+                🍽️ FoodFlow
+            </h1>
+
+            <p>
+                Place Your Order
+            </p>
+
+        </div>
+
+
+        <div class="customer-user-area">
+
+
+            <span class="customer-welcome">
+
+                Welcome, {{ session.get('customer_name') }}
+
+            </span>
+
+
+            <a href="{{ url_for('customer_home') }}"
+               class="back-btn">
+
+                ← Restaurants
+
+            </a>
+
+
+            <a href="{{ url_for('logout') }}"
+               class="nav-link">
+
+                🚪 Logout
+
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- =================================================
+         ORDER CONTAINER
+         ================================================= -->
+
+    <div class="order-container">
+
+
+        <!-- =================================================
+             SELECTED RESTAURANT
+             ================================================= -->
+
+        <div class="selected-restaurant">
+
+
+            <h2>
+                {{ restaurant[1] }}
+            </h2>
+
+
+            <p>
+                📍 {{ restaurant[2] }}
+            </p>
+
+
+            <p>
+                📞 {{ restaurant[3] }}
+            </p>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             ORDER FORM
+             ================================================= -->
+
+        <form method="POST"
+              action="{{ url_for(
+                  'place_order',
+                  restaurant_id=restaurant[0]
+              ) }}">
+
+
+
+            <!-- =================================================
+                 CUSTOMER DETAILS
+                 ================================================= -->
+
+            <div class="customer-form-section">
+
+
+                <h2>
+                    Customer Details
+                </h2>
+
+
+                <div class="form-grid">
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Name
+                        </label>
+
+                        <input
+                            type="text"
+                            value="{{ session.get('customer_name') }}"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Customer ID
+                        </label>
+
+                        <input
+                            type="text"
+                            value="{{ session.get('customer_id') }}"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Delivery Address
+                        </label>
+
+                        <input
+                            type="text"
+                            value="{{ customer[4] }}"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Phone
+                        </label>
+
+                        <input
+                            type="text"
+                            value="{{ customer[2] }}"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            value="{{ customer[3] }}"
+                            readonly
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+                <p class="form-note">
+
+                    Your registered customer information will be used
+                    for this order.
+
+                </p>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 FOOD ITEMS
+                 ================================================= -->
+
+            <div class="customer-form-section">
+
+
+                <h2>
+                    Select Food
+                </h2>
+
+
+                <p class="section-description">
+
+                    Select the quantity of each item you want to order.
+
+                </p>
+
+
+                {% if menu_items %}
+
+
+                <div class="food-list">
+
+
+                    {% for item in menu_items %}
+
+
+                    <div class="food-item">
+
+
+                        <div class="food-information">
+
+
+                            <h3>
+                                {{ item[1] }}
+                            </h3>
+
+
+                            <p>
+                                {{ item[2] }}
+                            </p>
+
+
+                            <strong>
+                                ₹{{ "%.2f"|format(item[4]) }}
+                            </strong>
+
+
+                        </div>
+
+
+
+                        <div class="quantity-box">
+
+
+                            <label>
+                                Quantity
+                            </label>
+
+
+                            <input
+                                type="number"
+                                name="quantity_{{ item[0] }}"
+                                value="0"
+                                min="0"
+                                max="20"
+                            >
+
+
+                        </div>
+
+
+                    </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+                {% else %}
+
+
+                <div class="empty-state">
+
+
+                    <div class="empty-icon">
+                        🍽️
+                    </div>
+
+
+                    <h3>
+                        No Menu Items Available
+                    </h3>
+
+
+                    <p>
+                        This restaurant currently has no food items available.
+                    </p>
+
+
+                </div>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PAYMENT METHOD
+                 ================================================= -->
+
+            <div class="customer-form-section">
+
+
+                <h2>
+                    Payment Method
+                </h2>
+
+
+                <div class="form-group">
+
+
+                    <label for="payment_method">
+                        Select Payment Method
+                    </label>
+
+
+                    <select
+                        id="payment_method"
+                        name="payment_method"
+                        required
+                    >
+
+
+                        <option value="">
+                            Select Payment Method
+                        </option>
+
+
+                        <option value="UPI">
+                            UPI
+                        </option>
+
+
+                        <option value="Card">
+                            Card
+                        </option>
+
+
+                        <option value="Cash">
+                            Cash
+                        </option>
+
+
+                        <option value="Net Banking">
+                            Net Banking
+                        </option>
+
+
+                    </select>
+
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PLACE ORDER
+                 ================================================= -->
+
+            <button
+                type="submit"
+                class="place-order-btn"
+            >
+
+                🛒 Place Order
+
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
