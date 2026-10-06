@@ -7,7 +7,8 @@ from flask import (
     session
 )
 from functools import wraps
-import oracledb
+import os
+import psycopg2
 
 
 app = Flask(__name__)
@@ -21,11 +22,14 @@ app.secret_key = "foodflow_secret_key_2026"
 # =========================================================
 
 def get_connection():
-    return oracledb.connect(
-        user="FOOD_DELIVERY",
-        password="food123",
-        dsn="localhost:1521/freepdb1"
-    )
+    database_url = os.environ.get("DATABASE_URL")
+
+    if not database_url:
+        raise RuntimeError(
+            "DATABASE_URL environment variable is not set."
+        )
+
+    return psycopg2.connect(database_url)
 
 
 # =========================================================
@@ -36,7 +40,7 @@ def get_next_id(cursor, table_name, column_name):
 
     cursor.execute(
         f"""
-        SELECT NVL(MAX({column_name}), 0) + 1
+        SELECT COALESCE(MAX({column_name}), 0) + 1
         FROM {table_name}
         """
     )
@@ -222,8 +226,8 @@ def customer_details():
                 Phone,
                 Address
             FROM CUSTOMER
-            WHERE Email = :1
-               OR Phone = :2
+            WHERE Email = %s
+               OR Phone = %s
             """,
             (email, phone)
         )
@@ -268,11 +272,11 @@ def customer_details():
             )
             VALUES
             (
-                :1,
-                :2,
-                :3,
-                :4,
-                :5
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
             )
             """,
             (
@@ -350,8 +354,8 @@ def delivery_login():
                 Partner_ID,
                 Name
             FROM DELIVERY_PARTNER
-            WHERE Login_Username = :1
-              AND Login_Password = :2
+            WHERE Login_Username = %s
+              AND Login_Password = %s
             """,
             (
                 username,
@@ -488,16 +492,16 @@ def admin_dashboard():
             SELECT
                 R.Restaurant_ID,
                 R.Restaurant_Name,
-                TRUNC(O.Order_Date) AS Order_Day,
+                O.Order_Date::date AS Order_Day,
                 COUNT(O.Order_ID) AS Order_Count
             FROM RESTAURANT R
             LEFT JOIN FOOD_ORDER O
                 ON R.Restaurant_ID = O.Restaurant_ID
-                AND O.Order_Date >= TRUNC(SYSDATE) - 6
+                AND O.Order_Date >= CURRENT_DATE - INTERVAL '6 days'
             GROUP BY
                 R.Restaurant_ID,
                 R.Restaurant_Name,
-                TRUNC(O.Order_Date)
+                O.Order_Date::date
             ORDER BY
                 R.Restaurant_ID,
                 Order_Day
@@ -714,7 +718,7 @@ def order_details_page(order_id):
             FROM ORDER_DETAIL OD
             JOIN MENU_ITEM MI
                 ON OD.Item_ID = MI.Item_ID
-            WHERE OD.Order_ID = :1
+            WHERE OD.Order_ID = %s
             ORDER BY OD.Order_Detail_ID
         """, (order_id,))
 
@@ -773,7 +777,7 @@ def payments_page():
                     FROM PAYMENT P
                     JOIN FOOD_ORDER O
                         ON P.Order_ID = O.Order_ID
-                    WHERE P.Payment_ID = :1
+                    WHERE P.Payment_ID = %s
                     """,
                     (payment_id,)
                 )
@@ -812,7 +816,7 @@ def payments_page():
                             """
                             UPDATE PAYMENT
                             SET Payment_Status = 'Refunded'
-                            WHERE Payment_ID = :1
+                            WHERE Payment_ID = %s
                             """,
                             (payment_id,)
                         )
@@ -950,7 +954,7 @@ def deliveries_page():
                 """
                 SELECT Order_ID
                 FROM FOOD_ORDER
-                WHERE Order_ID = :1
+                WHERE Order_ID = %s
                 """,
                 (order_id,)
             )
@@ -967,7 +971,7 @@ def deliveries_page():
                     """
                     SELECT COUNT(*)
                     FROM DELIVERY
-                    WHERE Order_ID = :1
+                    WHERE Order_ID = %s
                     """,
                     (order_id,)
                 )
@@ -986,7 +990,7 @@ def deliveries_page():
                         """
                         SELECT Partner_ID
                         FROM DELIVERY_PARTNER
-                        WHERE Partner_ID = :1
+                        WHERE Partner_ID = %s
                         """,
                         (partner_id,)
                     )
@@ -1016,9 +1020,9 @@ def deliveries_page():
                             )
                             VALUES
                             (
-                                :1,
-                                :2,
-                                :3,
+                                %s,
+                                %s,
+                                %s,
                                 'Assigned'
                             )
                             """,
@@ -1070,7 +1074,7 @@ def deliveries_page():
                     """
                     SELECT Order_ID
                     FROM DELIVERY
-                    WHERE Delivery_ID = :1
+                    WHERE Delivery_ID = %s
                     """,
                     (delivery_id,)
                 )
@@ -1091,9 +1095,9 @@ def deliveries_page():
                             """
                             UPDATE DELIVERY
                             SET
-                                Delivery_Status = :1,
-                                Delivery_Date = SYSDATE
-                            WHERE Delivery_ID = :2
+                                Delivery_Status = %s,
+                                Delivery_Date = CURRENT_TIMESTAMP
+                            WHERE Delivery_ID = %s
                             """,
                             (
                                 delivery_status,
@@ -1106,8 +1110,8 @@ def deliveries_page():
                         cursor.execute(
                             """
                             UPDATE DELIVERY
-                            SET Delivery_Status = :1
-                            WHERE Delivery_ID = :2
+                            SET Delivery_Status = %s
+                            WHERE Delivery_ID = %s
                             """,
                             (
                                 delivery_status,
@@ -1272,7 +1276,7 @@ def update_order():
                     """
                     SELECT Order_ID
                     FROM FOOD_ORDER
-                    WHERE Order_ID = :1
+                    WHERE Order_ID = %s
                     """,
                     (order_id,)
                 )
@@ -1288,8 +1292,8 @@ def update_order():
                     cursor.execute(
                         """
                         UPDATE FOOD_ORDER
-                        SET Order_Status = :1
-                        WHERE Order_ID = :2
+                        SET Order_Status = %s
+                        WHERE Order_ID = %s
                         """,
                         (
                             status,
@@ -1306,7 +1310,7 @@ def update_order():
                             """
                             UPDATE DELIVERY
                             SET Delivery_Status = 'Assigned'
-                            WHERE Order_ID = :1
+                            WHERE Order_ID = %s
                             """,
                             (order_id,)
                         )
@@ -1317,7 +1321,7 @@ def update_order():
                             """
                             UPDATE DELIVERY
                             SET Delivery_Status = 'Out for Delivery'
-                            WHERE Order_ID = :1
+                            WHERE Order_ID = %s
                             """,
                             (order_id,)
                         )
@@ -1329,8 +1333,8 @@ def update_order():
                             UPDATE DELIVERY
                             SET
                                 Delivery_Status = 'Delivered',
-                                Delivery_Date = SYSDATE
-                            WHERE Order_ID = :1
+                                Delivery_Date = CURRENT_TIMESTAMP
+                            WHERE Order_ID = %s
                             """,
                             (order_id,)
                         )
@@ -1341,7 +1345,7 @@ def update_order():
                             """
                             UPDATE DELIVERY
                             SET Delivery_Status = 'Cancelled'
-                            WHERE Order_ID = :1
+                            WHERE Order_ID = %s
                             """,
                             (order_id,)
                         )
@@ -1439,7 +1443,7 @@ def customer_menu(restaurant_id):
                 Email,
                 Address
             FROM CUSTOMER
-            WHERE Customer_ID = :1
+            WHERE Customer_ID = %s
             """,
             (customer_id,)
         )
@@ -1458,7 +1462,7 @@ def customer_menu(restaurant_id):
                 Location,
                 Phone
             FROM RESTAURANT
-            WHERE Restaurant_ID = :1
+            WHERE Restaurant_ID = %s
             """,
             (restaurant_id,)
         )
@@ -1480,7 +1484,7 @@ def customer_menu(restaurant_id):
                 Category,
                 Price
             FROM MENU_ITEM
-            WHERE Restaurant_ID = :1
+            WHERE Restaurant_ID = %s
             ORDER BY Item_ID
             """,
             (restaurant_id,)
@@ -1523,7 +1527,7 @@ def customer_orders():
             FROM FOOD_ORDER O
             JOIN RESTAURANT R
                 ON O.Restaurant_ID = R.Restaurant_ID
-            WHERE O.Customer_ID = :1
+            WHERE O.Customer_ID = %s
             ORDER BY O.Order_ID DESC
             """,
             (customer_id,)
@@ -1549,7 +1553,7 @@ def customer_orders():
                 FROM ORDER_DETAIL OD
                 JOIN MENU_ITEM MI
                     ON OD.Item_ID = MI.Item_ID
-                WHERE OD.Order_ID = :1
+                WHERE OD.Order_ID = %s
                 ORDER BY OD.Order_Detail_ID
                 """,
                 (order_id,)
@@ -1585,8 +1589,8 @@ def cancel_customer_order(order_id):
             SELECT
                 Order_Status
             FROM FOOD_ORDER
-            WHERE Order_ID = :1
-              AND Customer_ID = :2
+            WHERE Order_ID = %s
+              AND Customer_ID = %s
             """,
             (order_id, customer_id)
         )
@@ -1613,8 +1617,8 @@ def cancel_customer_order(order_id):
             """
             UPDATE FOOD_ORDER
             SET Order_Status = 'Cancelled'
-            WHERE Order_ID = :1
-              AND Customer_ID = :2
+            WHERE Order_ID = %s
+              AND Customer_ID = %s
             """,
             (order_id, customer_id)
         )
@@ -1624,7 +1628,7 @@ def cancel_customer_order(order_id):
             """
             UPDATE DELIVERY
             SET Delivery_Status = 'Cancelled'
-            WHERE Order_ID = :1
+            WHERE Order_ID = %s
               AND Partner_ID IS NOT NULL
             """,
             (order_id,)
@@ -1716,7 +1720,7 @@ def place_order(restaurant_id):
             """
             SELECT Customer_ID
             FROM CUSTOMER
-            WHERE Customer_ID = :1
+            WHERE Customer_ID = %s
             """,
             (customer_id,)
         )
@@ -1739,7 +1743,7 @@ def place_order(restaurant_id):
             """
             SELECT Restaurant_ID
             FROM RESTAURANT
-            WHERE Restaurant_ID = :1
+            WHERE Restaurant_ID = %s
             """,
             (restaurant_id,)
         )
@@ -1789,8 +1793,8 @@ def place_order(restaurant_id):
                     Item_ID,
                     Price
                 FROM MENU_ITEM
-                WHERE Item_ID = :1
-                  AND Restaurant_ID = :2
+                WHERE Item_ID = %s
+                  AND Restaurant_ID = %s
                 """,
                 (
                     item_id,
@@ -1856,10 +1860,10 @@ def place_order(restaurant_id):
             )
             VALUES
             (
-                :1,
-                :2,
-                :3,
-                :4,
+                %s,
+                %s,
+                %s,
+                %s,
                 'Placed'
             )
             """,
@@ -1899,11 +1903,11 @@ def place_order(restaurant_id):
                 )
                 VALUES
                 (
-                    :1,
-                    :2,
-                    :3,
-                    :4,
-                    :5
+                    %s,
+                    %s,
+                    %s,
+                    %s,
+                    %s
                 )
                 """,
                 (
@@ -1937,11 +1941,11 @@ def place_order(restaurant_id):
             )
             VALUES
             (
-                :1,
-                :2,
-                :3,
-                :4,
-                :5
+                %s,
+                %s,
+                %s,
+                %s,
+                %s
             )
             """,
             (
@@ -2016,8 +2020,8 @@ def order_success(order_id):
                 ON O.Customer_ID = C.Customer_ID
             JOIN RESTAURANT R
                 ON O.Restaurant_ID = R.Restaurant_ID
-            WHERE O.Order_ID = :1
-              AND O.Customer_ID = :2
+            WHERE O.Order_ID = %s
+              AND O.Customer_ID = %s
             """,
             (
                 order_id,
@@ -2074,7 +2078,7 @@ def delivery_dashboard():
                 Aadhaar_Number,
                 Login_Username
             FROM DELIVERY_PARTNER
-            WHERE Partner_ID = :1
+            WHERE Partner_ID = %s
             """,
             (partner_id,)
         )
@@ -2118,8 +2122,8 @@ def delivery_dashboard():
                     FROM DELIVERY D
                     JOIN FOOD_ORDER O
                         ON D.Order_ID = O.Order_ID
-                    WHERE D.Delivery_ID = :1
-                      AND D.Partner_ID = :2
+                    WHERE D.Delivery_ID = %s
+                      AND D.Partner_ID = %s
                     """,
                     (delivery_id, partner_id)
                 )
@@ -2177,8 +2181,8 @@ def delivery_dashboard():
                                 """
                                 UPDATE DELIVERY
                                 SET Delivery_Status = 'Picked Up'
-                                WHERE Delivery_ID = :1
-                                  AND Partner_ID = :2
+                                WHERE Delivery_ID = %s
+                                  AND Partner_ID = %s
                                 """,
                                 (delivery_id, partner_id)
                             )
@@ -2196,8 +2200,8 @@ def delivery_dashboard():
                                 """
                                 UPDATE DELIVERY
                                 SET Delivery_Status = 'Out for Delivery'
-                                WHERE Delivery_ID = :1
-                                  AND Partner_ID = :2
+                                WHERE Delivery_ID = %s
+                                  AND Partner_ID = %s
                                 """,
                                 (delivery_id, partner_id)
                             )
@@ -2206,7 +2210,7 @@ def delivery_dashboard():
                                 """
                                 UPDATE FOOD_ORDER
                                 SET Order_Status = 'Out for Delivery'
-                                WHERE Order_ID = :1
+                                WHERE Order_ID = %s
                                 """,
                                 (order_id,)
                             )
@@ -2222,9 +2226,9 @@ def delivery_dashboard():
                                 UPDATE DELIVERY
                                 SET
                                     Delivery_Status = 'Delivered',
-                                    Delivery_Date = SYSDATE
-                                WHERE Delivery_ID = :1
-                                  AND Partner_ID = :2
+                                    Delivery_Date = CURRENT_TIMESTAMP
+                                WHERE Delivery_ID = %s
+                                  AND Partner_ID = %s
                                 """,
                                 (delivery_id, partner_id)
                             )
@@ -2233,7 +2237,7 @@ def delivery_dashboard():
                                 """
                                 UPDATE FOOD_ORDER
                                 SET Order_Status = 'Delivered'
-                                WHERE Order_ID = :1
+                                WHERE Order_ID = %s
                                 """,
                                 (order_id,)
                             )
@@ -2249,7 +2253,7 @@ def delivery_dashboard():
                                     Payment_Method,
                                     Payment_Status
                                 FROM PAYMENT
-                                WHERE Order_ID = :1
+                                WHERE Order_ID = %s
                                 """,
                                 (order_id,)
                             )
@@ -2274,7 +2278,7 @@ def delivery_dashboard():
                                         """
                                         UPDATE PAYMENT
                                         SET Payment_Status = 'Paid'
-                                        WHERE Payment_ID = :1
+                                        WHERE Payment_ID = %s
                                         """,
                                         (payment_id,)
                                     )
@@ -2289,8 +2293,8 @@ def delivery_dashboard():
                                 """
                                 UPDATE DELIVERY
                                 SET Delivery_Status = 'Cancelled'
-                                WHERE Delivery_ID = :1
-                                  AND Partner_ID = :2
+                                WHERE Delivery_ID = %s
+                                  AND Partner_ID = %s
                                 """,
                                 (delivery_id, partner_id)
                             )
@@ -2299,7 +2303,7 @@ def delivery_dashboard():
                                 """
                                 UPDATE FOOD_ORDER
                                 SET Order_Status = 'Cancelled'
-                                WHERE Order_ID = :1
+                                WHERE Order_ID = %s
                                 """,
                                 (order_id,)
                             )
@@ -2347,7 +2351,7 @@ def delivery_dashboard():
             JOIN RESTAURANT R
                 ON O.Restaurant_ID = R.Restaurant_ID
 
-            WHERE D.Partner_ID = :1
+            WHERE D.Partner_ID = %s
 
             ORDER BY D.Delivery_ID DESC
             """,
@@ -2424,8 +2428,8 @@ def update_order_from_delivery(
     cursor.execute(
         """
         UPDATE FOOD_ORDER
-        SET Order_Status = :1
-        WHERE Order_ID = :2
+        SET Order_Status = %s
+        WHERE Order_ID = %s
         """,
         (
             order_status,
